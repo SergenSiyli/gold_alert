@@ -2,7 +2,7 @@ name: Altin fiyat bildirimi
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # her 10 dakikada bir (GitHub birkaç dk gecikebilir)
+    - cron: "*/10 * * * *"   # her 10 dk kontrol; ne zaman mesaj atılacağına script karar verir
   workflow_dispatch:          # elle çalıştırma butonu
 
 permissions:
@@ -26,9 +26,10 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ALERT_PCT: ${{ vars.ALERT_PCT }}
         run: python gold_alert.py
 
-      - name: Son fiyati kaydet
+      - name: Durumu kaydet
         run: |
           git config user.name "gold-bot"
           git config user.email "gold-bot@users.noreply.github.com"
