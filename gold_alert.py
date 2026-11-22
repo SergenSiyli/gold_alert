@@ -31,6 +31,9 @@ ALERT_PCT = float(os.environ.get("ALERT_PCT") or "1")
 
 GOLDPRICE_ORG_URL = "https://data-asg.goldprice.org/dbXRates/USD,TRY"
 GOLD_API_URL = "https://api.gold-api.com/price/XAU"
+USDTRY_URL = "https://open.er-api.com/v6/latest/USD"
+USDTRY_BACKUP_URL = ("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api"
+                     "@latest/v1/currencies/usd.json")
 BROWSER_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/130.0 Safari/537.36",
@@ -55,11 +58,20 @@ def from_goldprice_org():
     return price, float(items["TRY"]["xauPrice"]) / price, "goldprice.org"
 
 
+def get_usdtry():
+    """gold-api.com TRY desteklemiyor; kur ayrı ücretsiz kaynaklardan alınır."""
+    h = {"User-Agent": "gold-alert-bot"}
+    try:
+        return float(get_json(USDTRY_URL, h)["rates"]["TRY"])
+    except Exception as e:
+        print("open.er-api alınamadı, yedek kur kaynağı:", e, file=sys.stderr)
+        return float(get_json(USDTRY_BACKUP_URL, h)["usd"]["try"])
+
+
 def from_gold_api():
     h = {"User-Agent": "gold-alert-bot"}
     price = float(get_json(GOLD_API_URL, h)["price"])
-    usdtry = float(get_json(GOLD_API_URL + "/TRY", h)["exchangeRate"])
-    return price, usdtry, "gold-api.com"
+    return price, get_usdtry(), "gold-api.com"
 
 
 def get_data():
