@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "*/10 * * * *"   # her 10 dk kontrol; ne zaman mesaj atılacağına script karar verir
   workflow_dispatch:          # elle çalıştırma butonu
+    inputs:
+      test:
+        description: "Saatten bağımsız hemen mesaj gönder"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -27,6 +32,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ALERT_PCT: ${{ vars.ALERT_PCT }}
+          FORCE_SEND: ${{ inputs.test }}
         run: python gold_alert.py
 
       - name: Durumu kaydet

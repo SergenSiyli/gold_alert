@@ -28,6 +28,7 @@ AYLAR = ["Oca", "Şub", "Mar", "Nis", "May", "Haz",
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 ALERT_PCT = float(os.environ.get("ALERT_PCT") or "1")
+FORCE_SEND = os.environ.get("FORCE_SEND", "").lower() == "true"  # elle test
 
 GOLDPRICE_ORG_URL = "https://data-asg.goldprice.org/dbXRates/USD,TRY"
 GOLD_API_URL = "https://api.gold-api.com/price/XAU"
@@ -152,7 +153,9 @@ def main(now=None):
     last_sent = state.get("last_sent_price")
 
     text = None
-    if in_window and state.get("last_summary_hour") != hour_key:
+    if FORCE_SEND:
+        text = "🧪 TEST MESAJI\n\n" + body
+    elif in_window and state.get("last_summary_hour") != hour_key:
         text = body
         state["last_summary_hour"] = hour_key
     elif last_sent:
